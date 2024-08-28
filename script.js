@@ -18,7 +18,7 @@ function createGameboard() {
   return {getBoard, getNumMarkers, updateBoard};
 }
 
-function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") {
+const game = function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") {
   const player1 = createPlayer(playerOneName, 'X'); 
   const player2 = createPlayer(playerTwoName, 'O'); 
 
@@ -45,11 +45,58 @@ function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") 
     switchTurns();
     printBoard(); 
   }; 
+
   const printBoard = () => {
     console.log(board.getBoard()); 
-  }
-}
+  }; 
+
+  const playGame = () => {
+    while(board.getNumMarkers() < 9) {
+      playRound(); 
+      if(board.getNumMarkers() < 5) continue;
+
+      //Player 1 'X' win conditions
+      if(board.getBoard()[0]==='X'&&board.getBoard()[1]==='X'&&board.getBoard()[2]==='X' ||
+         board.getBoard()[3]==='X'&&board.getBoard()[4]==='X'&&board.getBoard()[5]==='X' ||
+         board.getBoard()[6]==='X'&&board.getBoard()[7]==='X'&&board.getBoard()[8]==='X' ||
+         board.getBoard()[0]==='X'&&board.getBoard()[3]==='X'&&board.getBoard()[6]==='X' ||
+         board.getBoard()[1]==='X'&&board.getBoard()[4]==='X'&&board.getBoard()[7]==='X' ||
+         board.getBoard()[2]==='X'&&board.getBoard()[5]==='X'&&board.getBoard()[8]==='X' ||
+         board.getBoard()[0]==='X'&&board.getBoard()[4]==='X'&&board.getBoard()[8]==='X' ||
+         board.getBoard()[2]==='X'&&board.getBoard()[4]==='X'&&board.getBoard()[6]==='X'  ) 
+      {
+        return player1.name; 
+      }
+      //Player 2 'O' win conditions
+      else if(board.getBoard()[0]==='O'&&board.getBoard()[1]==='O'&&board.getBoard()[2]==='O' ||
+              board.getBoard()[3]==='O'&&board.getBoard()[4]==='O'&&board.getBoard()[5]==='O' ||
+              board.getBoard()[6]==='O'&&board.getBoard()[7]==='O'&&board.getBoard()[8]==='O' ||
+              board.getBoard()[0]==='O'&&board.getBoard()[3]==='O'&&board.getBoard()[6]==='O' ||
+              board.getBoard()[1]==='O'&&board.getBoard()[4]==='O'&&board.getBoard()[7]==='O' ||
+              board.getBoard()[2]==='O'&&board.getBoard()[5]==='O'&&board.getBoard()[8]==='O' ||
+              board.getBoard()[0]==='O'&&board.getBoard()[4]==='O'&&board.getBoard()[8]==='O' ||
+              board.getBoard()[2]==='O'&&board.getBoard()[4]==='O'&&board.getBoard()[6]==='O'  )
+      {
+        return player2.name; 
+      }
+    }
+    return "Draw";
+  }; 
+
+  printBoard(); // initial printing of board
+
+  return {playGame, getActivePlayer};
+}("Rafee", "iPhone");
 
 function createPlayer(name, marker) {
   return {name, marker}; 
 }
+
+const winner = game.playGame(); 
+
+if(winner === "Draw") {
+  console.log("It's a DRAW!"); 
+} else {
+  console.log(`${winner} WINS`);
+}
+
