@@ -18,9 +18,9 @@ function createGameboard() {
   return {getBoard, getNumMarkers, updateBoard};
 }
 
-const game = function GameController(playerOneName = "Player 1", playerTwoName = "Player 2") {
-  const player1 = createPlayer(playerOneName, 'X'); 
-  const player2 = createPlayer(playerTwoName, 'O'); 
+const game = function GameController() {
+  const player1 = createPlayer("Player 1", 'X'); 
+  const player2 = createPlayer("Player 2", 'O'); 
 
   const board = createGameboard();
 
@@ -86,17 +86,17 @@ const game = function GameController(playerOneName = "Player 1", playerTwoName =
   printBoard(); // initial printing of board
 
   return {playGame, getActivePlayer};
-}("Rafee", "iPhone");
+}();
 
 function createPlayer(name, marker) {
   return {name, marker}; 
 }
 
-const winner = game.playGame(); 
+//const winner = game.playGame(); 
 
-if(winner === "Draw") {
+/*if(winner === "Draw") {
   console.log("It's a DRAW!"); 
 } else {
   console.log(`${winner} WINS`);
 }
-
+*/
