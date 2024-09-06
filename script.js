@@ -15,13 +15,20 @@ const board = function createGameboard() {
       return; 
     }
   }; 
-  return {getBoard, getNumMarkers, updateBoard};
+
+  const resetBoard = () => {
+    for(let i = 0; i < gameBoard.length; ++i) {
+      gameBoard[i] = null;
+    }
+    numMarkers = 0;
+  };
+  return {getBoard, getNumMarkers, updateBoard, resetBoard};
 }();
 
+// Key game functions
 const game = function GameController() {
   const player1 = createPlayer("Player 1", 'X'); 
   const player2 = createPlayer("Player 2", 'O'); 
-
 
   let activePlayer = player1; 
   const switchTurns = () => {
@@ -32,6 +39,9 @@ const game = function GameController() {
     }
   }; 
   const getActivePlayer = () => activePlayer; 
+  const resetActivePlayer = function() { // X always starts
+    activePlayer = player1;
+  }
 
   const checkWinner = () => {
     if(board.getNumMarkers() < 5) {
@@ -71,7 +81,7 @@ const game = function GameController() {
   }; 
 
 
-  return {playGame, getActivePlayer, switchTurns, checkWinner};
+  return {playGame, getActivePlayer, switchTurns, checkWinner, resetActivePlayer};
 }();
 
 function createPlayer(name, marker) {
@@ -81,11 +91,11 @@ function createPlayer(name, marker) {
 function displayController() {
   let player1;
   let player2;
-  const cells = document.querySelectorAll(".cell"); 
 
   let position;
 
   function allowClick() {
+    const cells = document.querySelectorAll(".cell"); 
     for(let i = 0; i < cells.length; ++i) {
       const cell = cells.item(i);
       cell.style.cursor = "pointer";
@@ -93,11 +103,10 @@ function displayController() {
     }
   }
   
-  async function waitForButtonClick(element) {
+  async function waitForButtonClick(element) { 
     await getPromiseFromItem(element, "click");
     const currentMarker = game.getActivePlayer().marker; 
     position = element.getAttribute("data-index");
-    element.classList.add("selected");
     element.textContent = currentMarker;
     board.updateBoard(currentMarker, position);
     game.switchTurns();
@@ -118,24 +127,51 @@ function displayController() {
   }
 
   function endGame(win) {
+    const cells = document.querySelectorAll(".cell"); 
     const winMsg = document.createElement("p");
+    let winMsg2;
+    const player1Card = document.querySelector(".player-1"); 
+    const player2Card = document.querySelector(".player-2"); 
     winMsg.classList.add("win-msg");
     if(win === 'X') {
       winMsg.textContent = `${player1.name} WINS!`;
-      const player1Card = document.querySelector(".player-1"); 
       player1Card.appendChild(winMsg);
     } else if(win === 'O') {
       winMsg.textContent = `${player2.name} WINS!`;
-      const player2Card = document.querySelector(".player-2"); 
       player2Card.appendChild(winMsg);
     } else {
       winMsg.textContent = "It's a DRAW!";
       winMsg.classList.add("draw");
-      const winMsg2 = winMsg.cloneNode(true);
-      const player1Card = document.querySelector(".player-1"); 
+      winMsg2 = winMsg.cloneNode(true);
       player1Card.append(winMsg);
-      const player2Card = document.querySelector(".player-2"); 
       player2Card.appendChild(winMsg2);
+    }
+    cells.forEach(cell => {
+      cell.replaceWith(cell.cloneNode(true));
+    });
+    const resetBtn = document.createElement("button");
+    resetBtn.classList.add("reset");
+    resetBtn.textContent = "Play again";
+    player1Card.appendChild(resetBtn);
+    resetBtn.addEventListener("click", resetHandler);
+
+    function resetHandler() {
+      board.resetBoard();
+      const cellsWrapper = document.querySelector(".cells-wrapper");
+      while(cellsWrapper.firstChild) {
+        cellsWrapper.removeChild(cellsWrapper.lastChild);
+      }
+      for(let i = 0; i < 9; ++i) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.setAttribute("data-index", i); 
+        cellsWrapper.appendChild(cell);
+      }
+      game.resetActivePlayer();
+      allowClick();
+      player1Card.removeChild(resetBtn);
+      winMsg.remove();
+      if(winMsg2) winMsg2.remove();
     }
   }
   
@@ -163,7 +199,3 @@ function displayController() {
 }
 
 game.playGame();
-
-// display winner and loser on left/right accordingly
-// highlight winning row
-// have restart button pop up that clears board but keeps names
