@@ -47,7 +47,7 @@ const game = function GameController() {
             board.getBoard()[0]==='X'&&board.getBoard()[4]==='X'&&board.getBoard()[8]==='X' ||
             board.getBoard()[2]==='X'&&board.getBoard()[4]==='X'&&board.getBoard()[6]==='X'  ) 
     {
-      return player1.name;
+      return 'X';
     }
     //Player 2 'O' win conditions
     else if(board.getBoard()[0]==='O'&&board.getBoard()[1]==='O'&&board.getBoard()[2]==='O' ||
@@ -59,7 +59,7 @@ const game = function GameController() {
             board.getBoard()[0]==='O'&&board.getBoard()[4]==='O'&&board.getBoard()[8]==='O' ||
             board.getBoard()[2]==='O'&&board.getBoard()[4]==='O'&&board.getBoard()[6]==='O'  )
     {
-      return player2.name; 
+      return 'O'; 
     }
     else if(board.getNumMarkers() === 9) {
       return "Draw";
@@ -79,19 +79,22 @@ function createPlayer(name, marker) {
 }
 
 function displayController() {
+  let player1;
+  let player2;
   const cells = document.querySelectorAll(".cell"); 
 
   let position;
 
-  window.onload = () => {
-  for(let i = 0; i < cells.length; ++i) {
-    const cell = cells.item(i);
-    waitForButtonClick(cell);
+  function allowClick() {
+    for(let i = 0; i < cells.length; ++i) {
+      const cell = cells.item(i);
+      cell.style.cursor = "pointer";
+      waitForButtonClick(cell);
+    }
   }
-}
   
   async function waitForButtonClick(element) {
-    await getPromiseFromCell(element, "click");
+    await getPromiseFromItem(element, "click");
     const currentMarker = game.getActivePlayer().marker; 
     position = element.getAttribute("data-index");
     element.classList.add("selected");
@@ -100,17 +103,11 @@ function displayController() {
     game.switchTurns();
     const winner = game.checkWinner();
     if(winner) {
-      if(winner === "Draw") {
-        console.log("It's a DRAW!");
-      } else {
-        console.log(`${winner} WINS!`);
-      }
+      endGame(winner);
     }
   }
   
-
-  
-  function getPromiseFromCell(item, event) {
+  function getPromiseFromItem(item, event) {
     return new Promise((resolve)=> {
       const listener = () => {
         item.removeEventListener(event, listener);
@@ -119,7 +116,54 @@ function displayController() {
       item.addEventListener(event, listener);
     });
   }
+
+  function endGame(win) {
+    const winMsg = document.createElement("p");
+    winMsg.classList.add("win-msg");
+    if(win === 'X') {
+      winMsg.textContent = `${player1.name} WINS!`;
+      const player1Card = document.querySelector(".player-1"); 
+      player1Card.appendChild(winMsg);
+    } else if(win === 'O') {
+      winMsg.textContent = `${player2.name} WINS!`;
+      const player2Card = document.querySelector(".player-2"); 
+      player2Card.appendChild(winMsg);
+    } else {
+      winMsg.textContent = "It's a DRAW!";
+      winMsg.classList.add("draw");
+      const winMsg2 = winMsg.cloneNode(true);
+      const player1Card = document.querySelector(".player-1"); 
+      player1Card.append(winMsg);
+      const player2Card = document.querySelector(".player-2"); 
+      player2Card.appendChild(winMsg2);
+    }
+  }
   
+
+  const nameForms = document.querySelectorAll("div form");
+  nameForms.forEach(form => form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const playerName = new FormData(form);
+    const userName = playerName.get("player-name");
+    const btn = form.querySelector("form button");
+    const readyStatusMsg = event.target.parentNode.querySelector(".ready-status");
+    btn.disabled = true; 
+    btn.style.cursor = "not-allowed";
+    form.querySelector("input").disabled = true;
+    readyStatusMsg.textContent = `${userName} is READY!`;
+    if(event.target.parentNode.classList.contains("player-1")) {
+      player1 = createPlayer(userName, 'X');
+    } else {
+      player2 = createPlayer(userName, 'O');
+    }
+    if(nameForms[0].querySelector("input").disabled === true && nameForms[1].querySelector("input").disabled === true) {
+      allowClick();
+    }
+  }));
 }
 
 game.playGame();
+
+// display winner and loser on left/right accordingly
+// highlight winning row
+// have restart button pop up that clears board but keeps names
