@@ -76,7 +76,7 @@ body {
   justify-content: center;
   align-items: center;
   border: 3px solid black;
-  cursor: pointer;
+  cursor: not-allowed;
   font-size: 4.4rem;
 }
 
@@ -105,27 +105,42 @@ body {
   border-style: solid none none solid ;
 }
 
-.player-1, .player-2 {
+.player {
   display: flex;
   flex-direction: column;
-  margin-top: 12px;
+  gap: 18px;
+  margin: 12px 30px;
 }
 
-.player-1 .name-input, 
-.player-2 .name-input {
+.player-2 {
+  align-items: flex-end;
+}
+
+.player .name-input {
   display: flex;
   flex-direction: column;
   width: fit-content;
-  align-self: center;
+}
+
+.player-2 .name-input {
+  align-self: flex-end;
+  margin-right: 12px;
+}
+
+.player-2 button {
+  align-self: flex-end;
 }
 
 .name-input button {
   width: fit-content;
-  
+  background-color: green;
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 input {
-  width: 130%;
+  width: 100%;
   border-radius: 4px;
   border: 1.5px solid #9b9b9b;
 }
@@ -135,3 +150,20 @@ input:focus {
   outline: none;
   border: 1.5px solid #227ec5; 
 }
+
+.player p:not(.name-input) {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.player p.win-msg {
+  font-size: 2rem;
+  font-style: italic;
+  text-decoration: underline;
+  color: green;
+}
+
+.player p.win-msg.draw {
+  color: blue;
+}
+
