@@ -132,27 +132,30 @@ function displayController() {
     let winMsg2;
     const player1Card = document.querySelector(".player-1"); 
     const player2Card = document.querySelector(".player-2"); 
+    const resetBtn = document.createElement("button");
+    resetBtn.classList.add("reset");
+    resetBtn.textContent = "Play again";
     winMsg.classList.add("win-msg");
     if(win === 'X') {
       winMsg.textContent = `${player1.name} WINS!`;
       player1Card.appendChild(winMsg);
+      player1Card.appendChild(resetBtn);
     } else if(win === 'O') {
       winMsg.textContent = `${player2.name} WINS!`;
       player2Card.appendChild(winMsg);
+      player2Card.appendChild(resetBtn); 
     } else {
       winMsg.textContent = "It's a DRAW!";
       winMsg.classList.add("draw");
       winMsg2 = winMsg.cloneNode(true);
       player1Card.append(winMsg);
       player2Card.appendChild(winMsg2);
+      player1Card.appendChild(resetBtn);
     }
     cells.forEach(cell => {
       cell.replaceWith(cell.cloneNode(true));
     });
-    const resetBtn = document.createElement("button");
-    resetBtn.classList.add("reset");
-    resetBtn.textContent = "Play again";
-    player1Card.appendChild(resetBtn);
+
     resetBtn.addEventListener("click", resetHandler);
 
     function resetHandler() {
@@ -169,7 +172,11 @@ function displayController() {
       }
       game.resetActivePlayer();
       allowClick();
-      player1Card.removeChild(resetBtn);
+      if(player1Card.contains(resetBtn)) {
+        player1Card.removeChild(resetBtn);
+      } else {
+        player2Card.removeChild(resetBtn);
+      }
       winMsg.remove();
       if(winMsg2) winMsg2.remove();
     }
