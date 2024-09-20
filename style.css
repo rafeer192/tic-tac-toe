@@ -167,3 +167,9 @@ input:focus {
   color: blue;
 }
 
+.player button.reset {
+  align-self: stretch;
+  padding: 8px 2px;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
